@@ -31,6 +31,8 @@ You can also set it up as a script in your package.json like so:
     "setup": "node qntm-setup.mjs"
   },
 ```
+Then run: 
+`npm run setup`
 
 Different types of repo's can be defined. Each modular bit of code will be in the subfolder of the repo. Right now I have created two example repo's for testing this.  
 
@@ -51,21 +53,21 @@ const blockDefs = {
 }
 ```
 
-FOLDER STRUCTURE
+EXAMPLE FOLDER STRUCTURE
 
-- themes
-    - nameOfTheme  
-        - resources
-            - qntm-blocks.php - Includes for blocks
-            - qntm-modules.php - Includes for modules
-            - blocks
+- /wp-content/themes
+    - /nameOfTheme  
+        - /resources
+            - /qntm-blocks.php - Includes for blocks
+            - /qntm-modules.php - Includes for modules
+            - /blocks/
                 - /block1/
                 - /block2/
-            - modules - any re-usable code that is not a block
+            - /modules/ - any re-usable code that is not a block
                 - /module1/
                 - /module2/ 
-            - repo - Repo's are cached here.
-                - blocks
-                - modules
-    - functions.php - On creation of qntm-blocks.php or qntm-modules.php, an include will be added here.
-    - .gitignore - The script will automatically add a line to ignore the repo folder
+            - /repo/ - Repo's are cached here.
+                - /blocks
+                - /modules
+    - /functions.php - On creation of qntm-blocks.php or qntm-modules.php, an include will be added here.
+    - /.gitignore - The script will automatically add a line to ignore the repo folder
