@@ -18,7 +18,7 @@ Copy `qntm-setup.mjs` to the root of your theme folder/theme repo.
 
 Install dependencies: 
 
-`<span style="color: #d4d4d4;">npm install @inquirer/prompts child_process fs</span>`
+`npm install @inquirer/prompts child_process fs`
 
 Running the script:
 
