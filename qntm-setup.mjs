@@ -148,6 +148,9 @@ const subdir = await select({
 		
 					fs.writeFileSync(qntmFunctionsFile, updatedContent, "utf8");
 					console.log(`Removed reference to ${targetDir}/${subdir}/index.php from ${qntmFunctionsFile}`);
+
+					await main(true); // Re-run the main function to prompt the user to choose again
+					return; // Exit after uninstalling
 				} else {
 					console.log("Uninstall cancelled.");
 					return;
@@ -194,34 +197,7 @@ const subdir = await select({
 		const sourceDir = `${cloneDir}/${subdir}`;
 		fs.cpSync(sourceDir, destinationDir, { recursive: true });
 
-		// Path to setup.mjs
-		const initFilePath = path.join(destinationDir, "setup.mjs");
-		let cleanupRequested = false;
 
-		// Check if setup.mjs exists before trying to run it
-		if (fs.existsSync(initFilePath)) {
-			const initProcess = spawn("node", ["setup.mjs"], { cwd: destinationDir, stdio: 'inherit' });
-
-
-
-			// initProcess.stdout.on("data", (data) => {
-			// 	console.log(`setup.mjs output: ${data}`);
-			// 	if (data.toString().includes("cleanup")) {
-			// 		cleanupRequested = true;
-			// 	}
-			// });
-
-			// initProcess.stderr.on("data", (data) => {
-			// 	console.error(`setup.mjs error: ${data}`);
-			// });
-
-			initProcess.on("close", (code) => {
-				console.log(`setup.mjs process exited with code ${code}`);
-				main(true);
-			});
-		} else {
-			console.log("setup.mjs does not exist, skipping execution.");
-		}
 
 		const functionsFile = "functions.php";
 
@@ -290,19 +266,70 @@ const subdir = await select({
 			if (!gitignoreContent.includes("node_modules")) {
 				fs.appendFileSync(gitignorePath, "node_modules\n");
 				console.log('Added ".node_modules" to .gitignore');
+			} else {
+				console.log('".node_modules" already exists in .gitignore, skipping addition.');
 			}
 
 			if (!gitignoreContent.includes(".vscode")) {
 				fs.appendFileSync(gitignorePath, ".vscode\n");
 				console.log('Added ".vscode" to .gitignore');
+			} else {
+				console.log('".vscode" already exists in .gitignore, skipping addition.');
 			}
+			 
 
 			// Check if 'resources/repo' is in .gitignore
 			if (!gitignoreContent.includes("resources/repo")) {
 				fs.appendFileSync(gitignorePath, "resources/repo\n");
 				console.log('Added "resources/repo" to .gitignore');
+			} else {
+				console.log('"resources/repo" already exists in .gitignore, skipping addition.');
 			}
 		}
+
+	/**
+	 * Spawns a child process to execute the setup.mjs file in the given destination
+	 * directory. This function will return true if the child process outputs the string
+	 * "cleanup" at any point, indicating that the calling process should perform a cleanup
+	 * operation.
+	 * @param {string} destinationDir - The directory path where the setup.mjs file should
+	 *                                  be executed.
+	 * @returns {Promise<boolean>} A promise that resolves with true if the child process
+	 *                              outputs "cleanup", or false otherwise.
+	 */
+		async function spawnChildProcess(destinationDir) {
+			const initFilePath = path.join(destinationDir, "setup.mjs");
+			let cleanupRequested = false;
+		  
+			if (fs.existsSync(initFilePath)) {
+			  const initProcess = spawn("node", ["setup.mjs"], { cwd: destinationDir, stdio: 'inherit' });
+		  
+			  initProcess.stdout.on("data", (data) => {
+				console.log(`setup.mjs output: ${data}`);
+				if (data.toString().includes("cleanup")) {
+				  cleanupRequested = true;
+				}
+			  });
+		  
+			  initProcess.stderr.on("data", (data) => {
+				console.error(`setup.mjs error: ${data}`);
+			  });
+		  
+			  await new Promise((resolve) => {
+				initProcess.on("exit", () => {
+				  console.log(`setup.mjs process exited`);
+				  resolve();
+				});
+			  });
+		  
+			  return cleanupRequested;
+			} else {
+			  console.log("setup.mjs does not exist, skipping execution.");
+			  return false;
+			}
+		  }
+		  
+		const cleanupRequested = await spawnChildProcess(destinationDir);
 
 		// Prompt the user to clean up only if init.js signaled it
 		if (cleanupRequested) {
