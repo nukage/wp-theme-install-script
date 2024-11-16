@@ -114,7 +114,14 @@ const subdir = await select({
   
       // Only add the Reinstall option if there is an exact match in the repository
       if (hasMatchingSubdirectory) {
+		  const setupMjsExists = fs.existsSync(path.join(destinationDir, "setup.mjs"));
+  
+		  if (setupMjsExists) {
+			  actionChoices.push("Run Setup Script");
+		  }
           actionChoices.push("Reinstall");
+		  // Check if a setup.mjs file exists in the subdirectory
+
       }
       actionChoices.push("Uninstall", "Rename", "Cancel");
 
@@ -123,8 +130,20 @@ const subdir = await select({
 				message: message,
 				choices: actionChoices,
 			});
+			if (action === "Run Setup Script") {
+				console.log("Running setup script for", subdir);
+			  
+				// Call the spawnChildProcess function from the selected directory
+				const cleanupRequested = await spawnChildProcess(destinationDir);
+			  
+				console.log("Setup script execution complete.");
+			  
+				// Re-run the main function after setup script finishes
+				await main(true);
+				return; // Exit after running setup script
+			  }
 
-			if (action === "Reinstall") {
+			else if (action === "Reinstall") {
 				// Delete the existing directory
 				execSync(`rm -rf ${destinationDir}`);
 				console.log(`Removed existing directory: ${destinationDir}`);
