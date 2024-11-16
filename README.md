@@ -1,6 +1,14 @@
 # Theme Module Installer Script
 
-This is a solution to how to easily import modular code. The script's purpose is to automate the process of installing modular bits of code, such as blocks, into a Wordpress theme. It should be compatible with any Wordpress theme.
+This is a solution for developers who want to easily import modular code from their own repositories. The script's purpose is to automate the process of installing modular bits of code, such as blocks, into a Wordpress theme. It should be compatible with any Wordpress theme.
+
+## Features:
+- Automates installation and uninstallation of modular code stored in Git repositories
+- Customizable to the project's folder structure and file naming schema
+- Creates .gitignore  and adds necessary folders into it to prevent file redundancy
+- Creates  necessary function files, and includes to those files
+- Removes includes on uninstallation of blocks/modules to prevent errors
+- Cleans up unneeded cached files after installation
 
 Blocks:  The usual Wordpress blocks we are used to, for building pages in Gutenberg.
 
@@ -61,12 +69,12 @@ EXAMPLE FOLDER STRUCTURE
             - /qntm-blocks.php - Includes for blocks
             - /qntm-modules.php - Includes for modules
             - /blocks/
-                - /block1/
+                - /block1/index.php - Much like plugins, each folder should have its own index.php to enqueue its own code.
                 - /block2/
             - /modules/ - any re-usable code that is not a block
                 - /module1/
                 - /module2/ 
-            - /repo/ - Repo's are cached here.
+            - /repo/ - The full repo's are cached here. 'Clean up' option removes this folder.
                 - /blocks
                 - /modules
     - /functions.php - On creation of qntm-blocks.php or qntm-modules.php, an include will be added here.
