@@ -9,6 +9,7 @@ This is a solution for developers who want to easily import modular code from th
 - Creates necessary function files, and php includes for to those files
 - Removes php includes on uninstallation of blocks/modules to prevent errors
 - Cleans up unneeded cached files after installation
+- Define as many repositories as you wish
 
 Blocks:  The usual Wordpress blocks we are used to, for building pages in Gutenberg.
 
@@ -47,18 +48,23 @@ Different types of repo's can be defined. Each modular bit of code will be in th
 The repositories, destination files, and relevant php files can be customized to your project's folder structure. You can easily modify these paths at the top of the script.
 
 ```Javascript
-const moduleDefs = {
-  "repoUrl" : "git@github.com:nukage/wp-modules.git",
-  "cloneDir" : "resources/repo/modules",
-  "targetDir" : "resources/modules",
-  "qntmFunctionsFile" : "resources/qntm-modules.php",
-}
-const blockDefs = {
-  "repoUrl" : "git@github.com:nukage/wp-blocks.git",
-  "cloneDir" : "resources/repo/blocks",
-  "targetDir" : "resources/blocks",
-  "qntmFunctionsFile" : "resources/qntm-blocks.php",
-}
+const repoDefinitions = [
+	{
+	  name: "Module",
+	  repoUrl: "git@github.com:nukage/wp-modules.git",
+	  cloneDir: "resources/repo/modules",
+	  targetDir: "resources/modules",
+	  repoFunctionsFile: "resources/qntm-modules.php",
+	},
+	{
+	  name: "Block",
+	  repoUrl: "git@github.com:nukage/wp-blocks.git",
+	  cloneDir: "resources/repo/blocks",
+	  targetDir: "resources/blocks",
+	  repoFunctionsFile: "resources/qntm-blocks.php",
+	}
+	// You can add more repo definitions here with the same structure
+  ];
 ```
 
 EXAMPLE FOLDER STRUCTURE

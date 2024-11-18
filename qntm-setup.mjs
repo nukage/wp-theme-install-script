@@ -10,14 +10,14 @@ const repoDefinitions = [
 	  repoUrl: "git@github.com:nukage/wp-modules.git",
 	  cloneDir: "resources/repo/modules",
 	  targetDir: "resources/modules",
-	  qntmFunctionsFile: "resources/qntm-modules.php",
+	  repoFunctionsFile: "resources/qntm-modules.php",
 	},
 	{
 	  name: "Block",
 	  repoUrl: "git@github.com:nukage/wp-blocks.git",
 	  cloneDir: "resources/repo/blocks",
 	  targetDir: "resources/blocks",
-	  qntmFunctionsFile: "resources/qntm-blocks.php",
+	  repoFunctionsFile: "resources/qntm-blocks.php",
 	}
 	// You can add more repo definitions here with the same structure
   ];
@@ -39,19 +39,29 @@ async function main(notFirstRun = false) {
 			choices: [...choices, "Clean Up", "Cancel"],
 		});
 
-		// let repoUrl, cloneDir, targetDir, qntmFunctionsFile;
+		// let repoUrl, cloneDir, targetDir, repoFunctionsFile;
 		if (choice === "Cancel") {
 			console.log("Exiting...");
 			return;
 		}
     if (choice === "Clean Up"){
-        execSync(`rm -rf resources/repo`);
-        console.log("Cleaned up repository.");
-        return;
+		const confirmCleanup = await select({
+			message: `Are you sure you want to delete the repo? Any uncommitted changes will be lost.`,
+			choices: ["Yes", "No"],
+		});
+
+		if (confirmCleanup === "Yes") {
+			execSync(`rm -rf resources/repo`);
+			console.log("Cleaned up repository.");
+			return;
+		} else{
+			console.log("Canceled cleanup.");
+			return;
+		}
     }
 	
 	const definition = getDefinition(choice);
-    const { repoUrl, cloneDir, targetDir, qntmFunctionsFile } = definition;
+    const { repoUrl, cloneDir, targetDir, repoFunctionsFile } = definition;
 
 
 		// Check if the clone directory exists
@@ -165,14 +175,14 @@ const subdir = await select({
 					console.log(`Uninstalled: ${destinationDir}`);
 		
 					// Remove the include line from the functions file
-					const functionsContent = fs.readFileSync(qntmFunctionsFile, "utf8");
+					const functionsContent = fs.readFileSync(repoFunctionsFile, "utf8");
 					const updatedContent = functionsContent
 						.split("\n")
 						.filter((line) => !line.includes(`'${targetDir}/${subdir}/index.php'`))
 						.join("\n");
 		
-					fs.writeFileSync(qntmFunctionsFile, updatedContent, "utf8");
-					console.log(`Removed reference to ${targetDir}/${subdir}/index.php from ${qntmFunctionsFile}`);
+					fs.writeFileSync(repoFunctionsFile, updatedContent, "utf8");
+					console.log(`Removed reference to ${targetDir}/${subdir}/index.php from ${repoFunctionsFile}`);
 
 					await main(true); // Re-run the main function to prompt the user to choose again
 					return; // Exit after uninstalling
@@ -196,7 +206,7 @@ const subdir = await select({
         console.log(`Renamed ${destinationDir} to ${newDestinationDir}`);
 
         // Update the functions file to reflect the new path
-        const functionsContent = fs.readFileSync(qntmFunctionsFile, "utf8");
+        const functionsContent = fs.readFileSync(repoFunctionsFile, "utf8");
         const updatedContent = functionsContent
             .split("\n")
             .map((line) =>
@@ -206,8 +216,8 @@ const subdir = await select({
             )
             .join("\n");
 
-        fs.writeFileSync(qntmFunctionsFile, updatedContent, "utf8");
-        console.log(`Updated references in ${qntmFunctionsFile}`);
+        fs.writeFileSync(repoFunctionsFile, updatedContent, "utf8");
+        console.log(`Updated references in ${repoFunctionsFile}`);
 
         await main(true); // Re-run the main function to prompt the user to choose again
         return; // Exit after renaming
@@ -235,41 +245,41 @@ const subdir = await select({
 		}
 
 		// Check if the relevant php functions file exists, create it if it doesn't
-		if (!fs.existsSync(qntmFunctionsFile)) {
+		if (!fs.existsSync(repoFunctionsFile)) {
 			fs.writeFileSync(
-				qntmFunctionsFile,
-				"<?php // This is the " + qntmFunctionsFile + " file\n",
+				repoFunctionsFile,
+				"<?php // This is the " + repoFunctionsFile + " file\n",
 				"utf8"
 			);
-			console.log(`Created ${qntmFunctionsFile}`);
+			console.log(`Created ${repoFunctionsFile}`);
 
 			// Modify functions.php to include it if it's created for the first time
 			const functionsContent = fs.readFileSync(functionsFile, "utf8");
 
 			// Insert PHP include statement for the respective qntm-functions.php
-			const includeCode = `\ninclude_once '${qntmFunctionsFile}';\n`;
+			const includeCode = `\ninclude_once '${repoFunctionsFile}';\n`;
 			const newFunctionsContent = functionsContent + includeCode;
 
 			fs.writeFileSync(functionsFile, newFunctionsContent, "utf8");
-			console.log(`Modified ${functionsFile} to include ${qntmFunctionsFile}`);
+			console.log(`Modified ${functionsFile} to include ${repoFunctionsFile}`);
 		} else {
-			console.log(`${qntmFunctionsFile} already exists, skipping creation.`);
+			console.log(`${repoFunctionsFile} already exists, skipping creation.`);
 		}
 
 		// Add the code for the subdirectory to the respective qntm-functions.php
 		const newCode = `\ninclude_once '${destinationDir}/index.php';\n`;
 
-		const functionsContent = fs.readFileSync(qntmFunctionsFile, "utf8");
+		const functionsContent = fs.readFileSync(repoFunctionsFile, "utf8");
 
 		// Check if the newCode already exists in the file
 		if (
 			!functionsContent.includes(`include_once '${destinationDir}/index.php';`)
 		) {
-			fs.appendFileSync(qntmFunctionsFile, newCode, "utf8");
-			console.log(`Added code for the subdirectory to ${qntmFunctionsFile}`);
+			fs.appendFileSync(repoFunctionsFile, newCode, "utf8");
+			console.log(`Added code for the subdirectory to ${repoFunctionsFile}`);
 		} else {
 			console.log(
-				`Code for the subdirectory already exists in ${qntmFunctionsFile}, skipping insertion.`
+				`Code for the subdirectory already exists in ${repoFunctionsFile}, skipping insertion.`
 			);
 		}
 
