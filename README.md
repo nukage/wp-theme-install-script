@@ -44,7 +44,7 @@ Then run:
 
 Different types of repo's can be defined. Each modular bit of code will be in the subfolder of the repo. Right now I have created two example repo's for testing this.  
 
-The repositories, destination files, and relevant php files can be customized to your project's folder structure. 
+The repositories, destination files, and relevant php files can be customized to your project's folder structure. You can easily modify these paths at the top of the script.
 
 ```Javascript
 const moduleDefs = {
