@@ -5,9 +5,9 @@ This is a solution for developers who want to easily import modular code from th
 ## Features:
 - Automates installation and uninstallation of modular code stored in Git repositories
 - Customizable to the project's folder structure and file naming schema
-- Creates .gitignore  and adds necessary folders into it to prevent file redundancy
-- Creates  necessary function files, and includes to those files
-- Removes includes on uninstallation of blocks/modules to prevent errors
+- Creates .gitignore and adds necessary folders into it to prevent file redundancy
+- Creates necessary function files, and php includes for to those files
+- Removes php includes on uninstallation of blocks/modules to prevent errors
 - Cleans up unneeded cached files after installation
 
 Blocks:  The usual Wordpress blocks we are used to, for building pages in Gutenberg.
