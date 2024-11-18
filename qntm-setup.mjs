@@ -3,23 +3,28 @@ import { execSync,spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
-const moduleDefs = {
-  "repoUrl" : "git@github.com:nukage/wp-modules.git",
-  "cloneDir" : "resources/repo/modules",
-  "targetDir" : "resources/modules",
-  "qntmFunctionsFile" : "resources/qntm-modules.php",
-}
-const blockDefs = {
-  "repoUrl" : "git@github.com:nukage/wp-blocks.git",
-  "cloneDir" : "resources/repo/blocks",
-  "targetDir" : "resources/blocks",
-  "qntmFunctionsFile" : "resources/qntm-blocks.php",
-}
 
-function getDefinitions(choice) {
-  return choice === "Module" ? moduleDefs : blockDefs;
-}
-
+const repoDefinitions = [
+	{
+	  name: "Module",
+	  repoUrl: "git@github.com:nukage/wp-modules.git",
+	  cloneDir: "resources/repo/modules",
+	  targetDir: "resources/modules",
+	  qntmFunctionsFile: "resources/qntm-modules.php",
+	},
+	{
+	  name: "Block",
+	  repoUrl: "git@github.com:nukage/wp-blocks.git",
+	  cloneDir: "resources/repo/blocks",
+	  targetDir: "resources/blocks",
+	  qntmFunctionsFile: "resources/qntm-blocks.php",
+	}
+	// You can add more repo definitions here with the same structure
+  ];
+  
+  function getDefinition(choice) {
+	return repoDefinitions.find((definition) => definition.name === choice);
+  }
 
 
 async function main(notFirstRun = false) {
@@ -28,9 +33,10 @@ async function main(notFirstRun = false) {
     console.log("Welcome to the QNTM setup script!  Let's get started.");
     console.log("Select Block or Module to install or uninstall site components.  ")
     console.log("Select Clean Up to delete the repository cache.  ")
+	const choices = repoDefinitions.map((definition) => definition.name);
 		const choice = await select({
 			message: "What do you want to do?",
-			choices: ["Block", "Module", "Clean Up", "Cancel"],
+			choices: [...choices, "Clean Up", "Cancel"],
 		});
 
 		// let repoUrl, cloneDir, targetDir, qntmFunctionsFile;
@@ -44,8 +50,8 @@ async function main(notFirstRun = false) {
         return;
     }
 	
-
-  const { repoUrl, cloneDir, targetDir, qntmFunctionsFile } = getDefinitions(choice);
+	const definition = getDefinition(choice);
+    const { repoUrl, cloneDir, targetDir, qntmFunctionsFile } = definition;
 
 
 		// Check if the clone directory exists
