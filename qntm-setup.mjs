@@ -333,6 +333,7 @@ const subdir = await select({
 	 *                              outputs "cleanup", or false otherwise.
 	 */
 		async function spawnChildProcess(destinationDir) {
+			process.env.CHILD_SCRIPT_DIR = destinationDir;
 			const initFilePath = path.join(destinationDir, "setup.mjs");
 			let cleanupRequested = false;
 		  
