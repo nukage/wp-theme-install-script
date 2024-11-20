@@ -265,15 +265,14 @@ const subdir = await select({
 		} else {
 			console.log(`${repoFunctionsFile} already exists, skipping creation.`);
 		}
-
-		// Add the code for the subdirectory to the respective qntm-functions.php
-		const newCode = `\ninclude_once '${destinationDir}/index.php';\n`;
+// Add the code for the subdirectory to the respective functions file
+		const newCode = `\ninclude_once get_theme_file_path('${destinationDir}/index.php');\n`;
 
 		const functionsContent = fs.readFileSync(repoFunctionsFile, "utf8");
 
 		// Check if the newCode already exists in the file
 		if (
-			!functionsContent.includes(`include_once '${destinationDir}/index.php';`)
+			!functionsContent.includes(`include_once get_theme_file_path('${destinationDir}/index.php');`)
 		) {
 			fs.appendFileSync(repoFunctionsFile, newCode, "utf8");
 			console.log(`Added code for the subdirectory to ${repoFunctionsFile}`);
