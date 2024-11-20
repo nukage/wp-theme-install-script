@@ -1,6 +1,15 @@
 # Theme Module Installer Script
 
-This is a solution for developers who want to easily import modular code from their own repositories. The script's purpose is to automate the process of installing modular bits of code, such as blocks, into a Wordpress theme. It should be compatible with any Wordpress theme.
+What is the script?
+
+It's a tool to automate the process of installing modular code (like blocks, custom post types, and helper functions) into your WordPress theme. This code is stored in your own private Git repositories.
+
+Why use it?
+
+- **Save time:** Automate the installation process, eliminating manual steps.
+- **Maintain code organization:** Keep your theme's codebase clean and structured.
+- **Promote code reusability:** Easily share and reuse code modules across different projects.
+- **Simplify theme development:** Streamline the workflow and focus on building features.
 
 ## Features:
 - Automates installation and uninstallation of modular code stored in Git repositories
